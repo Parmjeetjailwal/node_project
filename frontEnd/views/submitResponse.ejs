@@ -1,0 +1,16 @@
+<%- include('./layouts/head.ejs') %>
+
+    </head>
+
+    <body>
+        <%- include('./layouts/navbar.ejs') %>
+
+<div class="container mt-5">
+    <h3 class="text-center">You have Submitted following data.</h3>
+    <h5 class="mt-1">Employee Id: <%= data.id %>  </h5>
+    <h5 class="mt-1">Employee Name: <%= data.emp_name %> </h5>
+    <h5 class="mt-1">Employee Contact: <%= data.emp_contact %> </h5>
+    <h5 class="mt-1">Employee Address: <%= data.emp_add%> </h5>
+</div>
+
+        <% -include('./layouts/end.ejs') %>

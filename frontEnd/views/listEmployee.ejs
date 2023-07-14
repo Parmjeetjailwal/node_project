@@ -1,0 +1,35 @@
+<%- include('./layouts/head.ejs') %>
+
+    </head>
+
+    <body>
+        <%- include('./layouts/navbar.ejs') %>
+
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Emp. Code</th>
+                <th scope="col">Name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Address</th>
+                <th scope="col">action</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for(let emp of data){ %> 
+              <tr>
+                <th scope="row"><%= emp.emp_id %> </th>
+                <td><%= emp.emp_name %> </td>
+                <td><%= emp.emp_contact %> </td>
+                <td><%= emp.emp_add %> </td>
+                <td><a href="/delete/<%= emp.emp_id %> "><button class="btn-sm btn-danger">Delete</button></a></td>
+              </tr>
+
+              <% } %> 
+           
+             
+            </tbody>
+          </table>
+
+
+        <% -include('./layouts/end.ejs') %>
