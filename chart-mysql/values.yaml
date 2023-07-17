@@ -1,0 +1,13 @@
+replicaCount: 3
+
+image:
+  repository: parmjailwal007/sql-db
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v3"
+
+service:
+  type: ClusterIP
+  clusterIP: 10.96.10.127
+  port: 3306
+
