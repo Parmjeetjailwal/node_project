@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: parmjailwal007/frontend
   pullPolicy: IfNotPresent
-  tag: "v3"
+  tag: "latest"
 
 service:
   type: NodePort
