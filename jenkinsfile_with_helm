@@ -1,0 +1,97 @@
+pipeline {
+  environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhublogin')
+    github_token = credentials('github-token')
+    image1 = "parmjailwal007/frontend"
+    image2 = "parmjailwal007/backend"
+    image3 = "parmjailwal007/sql-db"
+    repoUrlWithAuth = "https://Parmjeetjailwal:$github_token@github.com/Parmjeetjailwal/node_project.git"
+    sourceBranch = "master"
+  }
+  
+  agent any
+  stages {
+    stage('Git clone') {
+      steps {
+        git 'https://github.com/Parmjeetjailwal/node_project.git'
+      }
+    }
+    
+    stage('Build Images') {
+      steps {
+        script {
+          sh "docker build -t $image1 frontEnd/"
+          sh "docker build -t $image2 backend/"
+          sh "docker build -t $image3 mysql/"
+        }
+      }
+    }
+    
+    stage('Login DockerHub') {
+      steps {
+        sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+      }
+    }
+    
+    stage('Push Images to DockerHub') {
+      steps {
+        script {
+          sh "docker push $image1:latest"
+          sh "docker push $image2:latest"
+          sh "docker push $image3:latest"
+        }
+      }
+    }
+    
+    stage('Packaging helm charts') {
+      steps {
+        script {
+          sh "helm package chart-frontend --version 1.0.0 && helm package chart-backend --version 1.0.0 && helm package chart-mysql --version 1.0.0"
+        }
+      }
+    }
+    
+    stage('pushing helm packages to github'){
+      steps{
+        script {
+          
+            sh "git config --global user.name 'Parmjeetjailwal'"
+            sh "git config --global user.email 'vermaparmjeet@gmail.com'"
+            sh "git add ."
+            sh "git commit -m 'Helm chart created'"
+            
+            sh "git push --repo=${repoUrlWithAuth} --set-upstream ${repoUrlWithAuth} ${sourceBranch}"
+          
+        }
+      }
+    }
+    
+    stage('Uninstalling helm packages if earlier installed') {
+    steps {
+        script {
+            def installedPackages = sh(returnStdout: true, script: 'helm list -q').trim().split('\n')
+            for (pkg in ['frontend-chart', 'backend-chart', 'mysql-chart']) {
+                if (installedPackages.contains(pkg)) {
+                    sh "helm uninstall ${pkg}"
+                } else {
+                    echo "Package '${pkg}' is not installed. Skipping uninstallation."
+                }
+            }
+        }
+    }
+}
+
+
+
+
+    stage('installing helm packages'){
+      steps{
+        script {
+            sh "cd chart-frontend && helm install chart-frontend ../chart-frontend-1.0.0.tgz"
+            sh "cd chart-backend && helm install chart-backend ../chart-backend-1.0.0.tgz"
+            sh "cd chart-mysql && helm install chart-mysql ../chart-mysql-1.0.0.tgz"
+        }
+      }
+    }
+  }
+}
